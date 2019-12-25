@@ -1,0 +1,17 @@
+当浏览器想向服务器请求数据时
+1.浏览器根据本地的缓存结果和缓存标识来决定是否发送请求。当发现本地有资源时，会采用强缓存策略，强缓存不会向服务器请求资源，直接从缓存中读取数据。此时有关
+的标识是expires(http1.0的遗留产物，表示缓存留存时间)/cahce-control：max-age/public/private/no-cache/no-store...等等。此时返回的状态码是200
+其中max-age表示资源到期时间，优先级比expires高
+   public/private:决定资源能否由代理服务器缓存
+   no-cache:在客户端的request header中表示客户端不会接受缓存过的资源，这意味这必须从源服务器拿资源
+            在服务器的response header中表示代理服务器不能对资源进行缓存
+            no-cache的作用是防止从代理服务器拿到过期的资源
+   no-store:暗示了资源有机密性，所以在任何一个地方都不能进行缓存
+2.当浏览器发现本地没有缓存结果和相关标识，那么它就会向服务器请求资源，三次握手后，服务器会检查它携带的header中的if-modified-since/if-nono-match。
+  通过这两个信息来确定浏览器本地的缓存资源和服务器修改的资源是否相同，如果相同则采用协商缓存策略，那么服务器什么资源都不用返回，此时的状态码是304；
+  相关的header有last-modified/if-modified-since,Etag/if-none-match。
+  当浏览器第一次访问的时候，服务器会返回浏览器last-modified和Etag的值，这个值就是下一次请求时候if-modified-since/if-none-match的值。通过对比
+  就可以知道是否资源修改过了。
+
+  
+              
